@@ -361,9 +361,10 @@ export default function HolidaysPage() {
         </main>
       </div>
 
-      {/* Add/Edit Holiday Modal */}
+      {/* Add/Edit Holiday Modal - 安卓风格全屏模态框 */}
       {(showAddModal || showEditModal) && (
         <>
+          {/* 背景遮罩 */}
           <div
             className="fixed inset-0 z-[9998] bg-black/30 backdrop-blur-sm"
             onClick={() => {
@@ -373,107 +374,217 @@ export default function HolidaysPage() {
               resetForm()
             }}
           />
+
+          {/* 模态框内容 */}
           <div
-            className="fixed left-1/2 top-1/2 z-[10000] -translate-x-1/2 -translate-y-1/2"
+            className="fixed left-0 z-[10000]"
             style={{
+              top: "150px",
               background: "white",
-              width: "800px",
-              borderRadius: "25px",
-              boxShadow: "0 10px 30px rgba(0,0,0,0.3)",
-              padding: "40px",
+              width: "100vw",
+              height: "calc(100vh - 150px)",
+              overflow: "hidden",
+              fontFamily: '"Microsoft YaHei", sans-serif',
             }}
           >
-            <h3 style={{ fontSize: "48px", fontWeight: 600, marginBottom: "30px", textAlign: "center" }}>
-              {editingHoliday ? "编辑假期" : "添加假期"}
-            </h3>
+            {/* 顶部操作栏 */}
+            <div
+              className="flex items-center justify-between"
+              style={{
+                height: "80px",
+                padding: "0 40px",
+                borderBottom: "1px solid #e5e7eb",
+                background: "#fff",
+              }}
+            >
+              <button
+                onClick={() => {
+                  setShowAddModal(false)
+                  setShowEditModal(false)
+                  setEditingHoliday(null)
+                  resetForm()
+                }}
+                style={{
+                  fontSize: "32px",
+                  fontWeight: 400,
+                  color: "#666",
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                }}
+              >
+                取消
+              </button>
+              <div
+                style={{
+                  fontSize: "36px",
+                  fontWeight: 600,
+                  color: "#000",
+                }}
+              >
+                {editingHoliday ? "编辑假期" : "添加假期"}
+              </div>
+              <button
+                onClick={handleSaveHoliday}
+                style={{
+                  fontSize: "32px",
+                  fontWeight: 600,
+                  color: "#4f6ff1",
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                }}
+              >
+                {editingHoliday ? "保存" : "添加"}
+              </button>
+            </div>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: "25px" }}>
-              <div>
-                <label style={{ fontSize: "32px", fontWeight: 500, marginBottom: "10px", display: "block" }}>
+            {/* 表单内容区域 */}
+            <div
+              className="overflow-y-auto"
+              style={{
+                height: "calc(100% - 80px)",
+                padding: "0",
+              }}
+            >
+              {/* 假期名称 */}
+              <div
+                style={{
+                  padding: "30px 40px",
+                  borderBottom: "1px solid #f0f0f0",
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: "28px",
+                    fontWeight: 500,
+                    color: "#333",
+                    marginBottom: "15px",
+                  }}
+                >
                   假期名称
-                </label>
+                </div>
                 <input
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
+                  placeholder="请输入假期名称"
                   style={{
                     width: "100%",
-                    padding: "15px 20px",
-                    fontSize: "28px",
-                    border: "2px solid #e5e7eb",
-                    borderRadius: "15px",
+                    padding: "20px 0",
+                    fontSize: "32px",
+                    border: "none",
                     outline: "none",
+                    background: "transparent",
+                    color: "#000",
                   }}
-                  placeholder="请输入假期名称"
                 />
               </div>
 
-              <div style={{ display: "flex", gap: "20px" }}>
-                <div style={{ flex: 1 }}>
-                  <label style={{ fontSize: "32px", fontWeight: 500, marginBottom: "10px", display: "block" }}>
-                    开始日期
-                  </label>
-                  <button
-                    onClick={() => {
-                      setIsSelectingStartDate(true)
-                      const date = formData.startDate ? new Date(formData.startDate + "T00:00:00") : new Date()
-                      setShowStartDateModal(true)
-                    }}
-                    style={{
-                      width: "100%",
-                      padding: "15px 20px",
-                      fontSize: "28px",
-                      border: "2px solid #e5e7eb",
-                      borderRadius: "15px",
-                      background: "#fff",
-                      cursor: "pointer",
-                      textAlign: "left",
-                    }}
-                  >
-                    {formData.startDate ? formatDate(formData.startDate) : "选择开始日期"}
-                  </button>
+              {/* 开始日期 */}
+              <div
+                style={{
+                  padding: "30px 40px",
+                  borderBottom: "1px solid #f0f0f0",
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: "28px",
+                    fontWeight: 500,
+                    color: "#333",
+                    marginBottom: "15px",
+                  }}
+                >
+                  开始日期
                 </div>
-
-                <div style={{ flex: 1 }}>
-                  <label style={{ fontSize: "32px", fontWeight: 500, marginBottom: "10px", display: "block" }}>
-                    结束日期
-                  </label>
-                  <button
-                    onClick={() => {
-                      setIsSelectingStartDate(false)
-                      const date = formData.endDate ? new Date(formData.endDate + "T00:00:00") : new Date()
-                      setShowEndDateModal(true)
-                    }}
-                    style={{
-                      width: "100%",
-                      padding: "15px 20px",
-                      fontSize: "28px",
-                      border: "2px solid #e5e7eb",
-                      borderRadius: "15px",
-                      background: "#fff",
-                      cursor: "pointer",
-                      textAlign: "left",
-                    }}
-                  >
-                    {formData.endDate ? formatDate(formData.endDate) : "选择结束日期"}
-                  </button>
-                </div>
+                <button
+                  onClick={() => {
+                    setIsSelectingStartDate(true)
+                    setShowStartDateModal(true)
+                  }}
+                  style={{
+                    width: "100%",
+                    padding: "20px 0",
+                    fontSize: "32px",
+                    border: "none",
+                    outline: "none",
+                    background: "transparent",
+                    color: formData.startDate ? "#000" : "#999",
+                    textAlign: "left",
+                    cursor: "pointer",
+                  }}
+                >
+                  {formData.startDate ? formatDate(formData.startDate) : "选择开始日期"}
+                </button>
               </div>
 
-              <div>
-                <label style={{ fontSize: "32px", fontWeight: 500, marginBottom: "10px", display: "block" }}>
+              {/* 结束日期 */}
+              <div
+                style={{
+                  padding: "30px 40px",
+                  borderBottom: "1px solid #f0f0f0",
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: "28px",
+                    fontWeight: 500,
+                    color: "#333",
+                    marginBottom: "15px",
+                  }}
+                >
+                  结束日期
+                </div>
+                <button
+                  onClick={() => {
+                    setIsSelectingStartDate(false)
+                    setShowEndDateModal(true)
+                  }}
+                  style={{
+                    width: "100%",
+                    padding: "20px 0",
+                    fontSize: "32px",
+                    border: "none",
+                    outline: "none",
+                    background: "transparent",
+                    color: formData.endDate ? "#000" : "#999",
+                    textAlign: "left",
+                    cursor: "pointer",
+                  }}
+                >
+                  {formData.endDate ? formatDate(formData.endDate) : "选择结束日期"}
+                </button>
+              </div>
+
+              {/* 假期类型 */}
+              <div
+                style={{
+                  padding: "30px 40px",
+                  borderBottom: "1px solid #f0f0f0",
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: "28px",
+                    fontWeight: 500,
+                    color: "#333",
+                    marginBottom: "15px",
+                  }}
+                >
                   假期类型
-                </label>
+                </div>
                 <select
                   value={formData.type}
                   onChange={(e) => setFormData((prev) => ({ ...prev, type: e.target.value as Holiday["type"] }))}
                   style={{
                     width: "100%",
-                    padding: "15px 20px",
-                    fontSize: "28px",
-                    border: "2px solid #e5e7eb",
-                    borderRadius: "15px",
+                    padding: "20px 0",
+                    fontSize: "32px",
+                    border: "none",
                     outline: "none",
+                    background: "transparent",
+                    color: "#000",
                   }}
                 >
                   <option value="school">学校假期</option>
@@ -481,62 +592,38 @@ export default function HolidaysPage() {
                 </select>
               </div>
 
-              <div>
-                <label style={{ fontSize: "32px", fontWeight: 500, marginBottom: "10px", display: "block" }}>
+              {/* 备注说明 */}
+              <div
+                style={{
+                  padding: "30px 40px",
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: "28px",
+                    fontWeight: 500,
+                    color: "#333",
+                    marginBottom: "15px",
+                  }}
+                >
                   备注说明
-                </label>
+                </div>
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
+                  placeholder="请输入备注说明（可选）"
                   style={{
                     width: "100%",
-                    padding: "15px 20px",
-                    fontSize: "28px",
-                    border: "2px solid #e5e7eb",
-                    borderRadius: "15px",
-                    outline: "none",
-                    minHeight: "100px",
-                    resize: "vertical",
-                  }}
-                  placeholder="请输入备注说明（可选）"
-                />
-              </div>
-
-              <div style={{ display: "flex", gap: "20px", marginTop: "20px" }}>
-                <button
-                  onClick={() => {
-                    setShowAddModal(false)
-                    setShowEditModal(false)
-                    setEditingHoliday(null)
-                    resetForm()
-                  }}
-                  style={{
-                    flex: 1,
-                    padding: "15px",
-                    fontSize: "32px",
-                    border: "2px solid #e5e7eb",
-                    borderRadius: "15px",
-                    background: "#fff",
-                    cursor: "pointer",
-                  }}
-                >
-                  取消
-                </button>
-                <button
-                  onClick={handleSaveHoliday}
-                  style={{
-                    flex: 1,
-                    padding: "15px",
+                    padding: "20px 0",
                     fontSize: "32px",
                     border: "none",
-                    borderRadius: "15px",
-                    background: "#3742fa",
-                    color: "#fff",
-                    cursor: "pointer",
+                    outline: "none",
+                    background: "transparent",
+                    color: "#000",
+                    minHeight: "120px",
+                    resize: "none",
                   }}
-                >
-                  {editingHoliday ? "保存" : "添加"}
-                </button>
+                />
               </div>
             </div>
           </div>

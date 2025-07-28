@@ -1,43 +1,56 @@
-import type { DayData } from "../types/calendar"
-import { useHolidays } from "../context/HolidayContext"
+"use client"
+
+import { useResponsiveScale } from "@/hooks/useResponsiveScale"
+import { useHolidays } from "@/context/HolidayContext"
+import type { DayData } from "@/types/calendar"
 
 interface DayCellProps {
   day: DayData
   isMonthView?: boolean
-  scale: number
 }
 
-export function DayCell({ day, isMonthView = false, scale }: DayCellProps) {
+export function DayCell({ day, isMonthView = false }: DayCellProps) {
+  const scale = useResponsiveScale(1408)
   const { isHoliday } = useHolidays()
+
+  // 检查是否是节假日
   const isHolidayDate = isHoliday(day.fullDate)
 
+  const cellStyle = {
+    width: isMonthView ? "201px" : "100%",
+    height: isMonthView ? "201px" : "140px",
+    border: isMonthView ? "1px solid #e5e7eb" : "none",
+    borderTop: isMonthView ? "1px solid #e5e7eb" : "none",
+    borderLeft: isMonthView ? "1px solid #e5e7eb" : "none",
+    display: "flex",
+    flexDirection: "column" as const,
+    alignItems: "flex-start",
+    justifyContent: "flex-start",
+    padding: isMonthView ? "10px" : "20px 0",
+    backgroundColor: day.isToday ? "#4f6ff1" : day.isInactive ? "#f9fafb" : "#ffffff",
+    color: day.isToday ? "#ffffff" : day.isInactive ? "#9ca3af" : "#000000",
+    position: "relative" as const,
+    overflow: "hidden",
+  }
+
+  const dateStyle = {
+    fontSize: isMonthView ? "72px" : "48px",
+    fontWeight: day.isToday ? 700 : 400,
+    lineHeight: 1,
+    marginBottom: isMonthView ? "8px" : "4px",
+  }
+
+  const lunarStyle = {
+    fontSize: isMonthView ? "24px" : "20px",
+    fontWeight: 300,
+    opacity: day.isInactive ? 0.5 : 0.7,
+    lineHeight: 1,
+  }
+
   return (
-    <div
-      className="relative flex items-center justify-center"
-      style={{
-        width: isMonthView ? "150px" : "100px",
-        height: isMonthView ? "450px" : "90px",
-        opacity: day.isInactive ? 0.3 : 1,
-        flexDirection: isMonthView ? "column" : "row",
-        position: "relative",
-      }}
-      title={`${day.fullDate.toLocaleDateString("zh-CN")} ${["周日", "周一", "周二", "周三", "周四", "周五", "周六"][day.dayOfWeek]}`}
-    >
-      {/* 今日背景 */}
-      {day.isToday && (
-        <div
-          style={{
-            content: "",
-            background: "#1e39de",
-            borderRadius: "15px",
-            width: isMonthView ? "130px" : "80px",
-            height: isMonthView ? "430px" : "80px", // 月视图中几乎占满整个高度
-            position: "absolute",
-            boxShadow: "4px 4px 10px rgba(0, 0, 0, 0.25)",
-            zIndex: 0,
-          }}
-        />
-      )}
+    <div style={cellStyle}>
+      <div style={dateStyle}>{day.date}</div>
+      {day.lunarDate && <div style={lunarStyle}>{day.lunarDate}</div>}
 
       {/* 节假日标识 - 仅在月视图显示 */}
       {isMonthView && isHolidayDate && (
@@ -46,54 +59,15 @@ export function DayCell({ day, isMonthView = false, scale }: DayCellProps) {
             position: "absolute",
             top: "10px",
             right: "10px",
-            color: day.isToday ? "white" : "#ff4444",
             fontSize: "36px",
             fontWeight: 500,
+            color: day.isToday ? "#ffffff" : "#ff4444",
             zIndex: 10,
             lineHeight: 1,
           }}
         >
           休
         </div>
-      )}
-
-      {/* 日期内容 */}
-      {isMonthView ? (
-        <div className="relative z-10 flex flex-col items-center justify-center">
-          <span
-            style={{
-              color: day.isToday ? "white" : "#000",
-              fontSize: "72px", // 调整为1.5倍大小
-              fontWeight: 400,
-              marginBottom: "8px",
-              textAlign: "center",
-            }}
-          >
-            {day.date}
-          </span>
-          <span
-            style={{
-              color: day.isToday ? "white" : "#666",
-              fontSize: "48px", // 农历日期和周数大小保持不变
-              fontWeight: 400,
-              textAlign: "center",
-            }}
-          >
-            {day.holiday || day.lunarDate}
-          </span>
-        </div>
-      ) : (
-        <span
-          className="relative z-10"
-          style={{
-            color: day.isToday ? "white" : "#000",
-            fontSize: "48px",
-            fontWeight: 400,
-            textAlign: "center",
-          }}
-        >
-          {day.date}
-        </span>
       )}
     </div>
   )
