@@ -135,7 +135,16 @@ export function useCalendarData(config: CalendarConfig, semesterInfo: SemesterIn
     })
 
     const result: MonthData[] = Object.values(monthMap)
-      .sort((a, b) => (a.key > b.key ? 1 : -1))
+      .sort((a, b) => {
+        // 修复排序问题：解析年月进行数值比较而不是字符串比较
+        const [yearA, monthA] = a.key.split("-").map(Number)
+        const [yearB, monthB] = b.key.split("-").map(Number)
+
+        if (yearA !== yearB) {
+          return yearA - yearB
+        }
+        return monthA - monthB
+      })
       .map((m) => {
         const rows = m.weeks.length
         return {
